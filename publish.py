@@ -1,85 +1,116 @@
-#!/usr/bin/env bash
-set -euo pipefail
+# publish.py — create a branch, commit summary + artifacts, and open a PR.
+import subprocess as sp
+from pathlib import Path
+from datetime import datetime
+import sys, shlex
 
-# ===== config =====
-SRC_DIR="source code"
-SUMMARY_TARGET="docs/latest-sp800-summary.md"
-BRANCH="chore/sp800-summary-$(date +%Y%m%d-%H%M)"
-BASE="$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@origin/@@' || echo main)"
-KEEP_OPEN="true"   # set to "false" if you don't want the "Press Enter" pause
+ROOT = Path(__file__).resolve().parent
 
-# Pause on exit so your terminal doesn't close immediately
-trap 'ret=$?; if [[ $ret -ne 0 ]]; then echo; echo "❌ Script failed (exit $ret). See output above."; fi; 
-      if [[ "${KEEP_OPEN}" == "true" ]]; then echo; read -rp "Press Enter to close... "; fi; exit $ret' EXIT
+def run(cmd, check=True):
+    print(f"$ {cmd}")
+    result = sp.run(cmd, shell=True, text=True, capture_output=True)
+    if result.stdout: print(result.stdout.strip())
+    if result.stderr: print(result.stderr.strip())
+    if check and result.returncode != 0:
+        sys.exit(f"❌ Command failed: {cmd}\n(exit {result.returncode})")
+    return result
 
-echo "Base branch: $BASE"
-echo "New branch : $BRANCH"
+def default_base_branch():
+    # Try to detect the remote default (main/master)
+    r = run("git symbolic-ref refs/remotes/origin/HEAD", check=False)
+    if r.returncode == 0 and r.stdout:
+        ref = r.stdout.strip()
+        if ref.startswith("refs/remotes/origin/"):
+            return ref.split("/")[-1]
+    # Fallbacks:
+    for guess in ("main", "master"):
+        r = run(f"git rev-parse --verify origin/{guess}", check=False)
+        if r.returncode == 0:
+            return guess
+    return "main"
 
-# ===== auth =====
-if ! gh auth status >/dev/null 2>&1; then
-  gh auth login -s repo -w
-fi
+def find_summary():
+    # Try common locations and reasonable fallbacks
+    candidates = [
+        ROOT / "docs" / "latest-sp800-summary.md",
+        ROOT / "latest-sp800-summary.md",
+        ROOT / "summary.md",
+        ROOT / "Sorce Code" / "latest-sp800-summary.md",
+        ROOT / "Sorce Code" / "summary.md",
+    ]
+    # Also pick any sp800*.md under docs/
+    docs = ROOT / "docs"
+    if docs.exists():
+        for p in sorted(docs.glob("**/*sp800*.md")):
+            candidates.append(p)
+        for p in sorted(docs.glob("**/*summary*.md")):
+            candidates.append(p)
+    for p in candidates:
+        if p.exists():
+            return p
+    return None
 
-# ===== 1) run pipeline =====
-echo "==> Running Python steps"
-pushd "$SRC_DIR" >/dev/null
-python source.py
-python filter.py
-python summary.py
-popd >/dev/null
+def main():
+    # sanity
+    run("git status -s", check=False)
+    run("gh auth status", check=False)
 
-# ===== 2) collect outputs =====
-echo "==> Collecting outputs"
-mkdir -p "$(dirname "$SUMMARY_TARGET")"
+    base = default_base_branch()
+    stamp = datetime.now().strftime("%Y%m%d-%H%M")
+    branch = f"chore/sp800-summary-{stamp}"
 
-# If a summary already exists in docs/, keep it; else take the first summary-like file from $SRC_DIR
-if compgen -G "docs/*summary*.md" >/dev/null; then
-  CUR_DOC="$(ls docs/*summary*.md | head -n1)"
-  # Only copy if different path than target
-  if [[ "$CUR_DOC" != "$SUMMARY_TARGET" ]]; then
-    cp "$CUR_DOC" "$SUMMARY_TARGET"
-  fi
-else
-  FOUND="$(find "$SRC_DIR" -maxdepth 1 -type f \( -iname '*summary*.md' -o -iname '*sp800*.md' \) | head -n1 || true)"
-  if [[ -n "${FOUND}" ]]; then
-    cp "$FOUND" "$SUMMARY_TARGET"
-  else
-    echo "❌ No summary markdown found. Did summary.py create a file?"
-    exit 1
-  fi
-fi
+    # ensure required files exist
+    summary_file = find_summary()
+    if not summary_file:
+        sys.exit("❌ No summary markdown found. Run Summary.py first (it should create a summary .md).")
 
-echo "Summary at: $SUMMARY_TARGET"
-ls -lh "$SUMMARY_TARGET" || true
-[ -f "$SRC_DIR/step1_nist_sp800_raw.json" ] && ls -lh "$SRC_DIR/step1_nist_sp800_raw.json"
-[ -f "$SRC_DIR/step2_filtered.json" ]      && ls -lh "$SRC_DIR/step2_filtered.json"
+    # optional artifacts to include if present
+    artifacts = []
+    for name in ("step1_nist_sp800_raw.json", "step2_filtered.json"):
+        p = ROOT / name
+        if p.exists():
+            artifacts.append(p)
 
-# ===== 3) branch + commit =====
-echo "==> Creating branch and committing"
-git fetch origin "$BASE" --quiet || true
-git checkout -b "$BRANCH"
+    print(f"Base branch: {base}")
+    print(f"New branch:  {branch}")
+    print(f"Summary:     {summary_file}")
+    if artifacts:
+        print("Artifacts:   " + ", ".join(str(a) for a in artifacts))
 
-# Stage changes if any
-git add "$SUMMARY_TARGET" || true
-[ -f "$SRC_DIR/step1_nist_sp800_raw.json" ] && git add "$SRC_DIR/step1_nist_sp800_raw.json"
-[ -f "$SRC_DIR/step2_filtered.json" ]      && git add "$SRC_DIR/step2_filtered.json"
+    # create branch
+    run(f"git checkout -b {shlex.quote(branch)}")
 
-if git diff --cached --quiet; then
-  echo "ℹ️  No changes to commit; nothing to publish."
-  exit 0
-fi
+    # ensure docs/ exists if your summary is under docs/
+    if summary_file.parent != ROOT and not summary_file.parent.exists():
+        summary_file.parent.mkdir(parents=True, exist_ok=True)
 
-git commit -m "NIST SP 800: latest summary (automated) [$(date -u +%F)]" \
-            -m "Includes filtered artifacts for traceability."
-git push -u origin "$BRANCH"
+    # stage files
+    add_targets = [summary_file] + artifacts
+    quoted = " ".join(shlex.quote(str(p)) for p in add_targets)
+    run(f"git add {quoted}")
 
-# ===== 4) open PR =====
-echo "==> Opening PR"
-gh pr create \
-  --base "$BASE" \
-  --head "$BRANCH" \
-  --title "NIST SP 800: latest summary" \
-  --body  "Automated summary update from Codespaces (software/DevOps/SDLC focus) with filtered artifacts."
+    # commit
+    title = f"NIST SP 800: latest summary ({stamp})"
+    body  = (
+        "Automated summary update.\n\n"
+        "- Adds/updates latest SP 800 summary for software/DevOps/SDLC\n"
+        "- Includes filtered artifacts for traceability\n"
+        "- Generated in Codespaces\n"
+    )
+    run(f'git commit -m {shlex.quote(title)} -m {shlex.quote(body)}')
 
-echo "==> Done. Opening PR page…"
-gh pr view --web || true
+    # push & create PR
+    run(f"git push -u origin {shlex.quote(branch)}")
+    run(
+        "gh pr create "
+        f"--base {shlex.quote(base)} "
+        f"--head {shlex.quote(branch)} "
+        f"--title {shlex.quote(title)} "
+        f"--body  {shlex.quote(body)}"
+    )
+
+    print("✅ PR opened. View it with:  gh pr view --web")
+    run("gh pr view --web", check=False)
+
+if __name__ == '__main__':
+    main()
