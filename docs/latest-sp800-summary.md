@@ -1,29 +1,3 @@
-# Nist-Sp800-Updates-
-Latest updates on the NIST Sp800, Agentic AI Workflow that gives Updates and Applicability Summaries 
-
-# src/agentic_nist/summarize.py
-from __future__ import annotations
-from pathlib import Path
-from datetime import datetime
-import re
-from typing import Optional
-
-# Resolve repo root from this file: .../src/agentic_nist/summarize.py -> repo root
-_THIS = Path(__file__).resolve()
-ROOT = _THIS.parents[2]  # .../src/agentic_nist/ -> .../src -> REPO ROOT
-
-DOCS_DIR = ROOT / "docs"
-README_PATH = ROOT / "README.md"
-SUMMARY_MD = DOCS_DIR / "latest-sp800-summary.md"
-
-START = "<!-- START:LATEST_SP800_SUMMARY -->
-
-## Latest NIST SP 800 Summary
-_Last updated: 2025-09-03 23:22 UTC_  ·  [Open as a standalone file](/workspaces/Nist-Sp800-Updates-/docs/latest-sp800-summary.md)
-
-<details>
-<summary>Preview (first 200 lines)</summary>
-
 # NIST SP 800 Updates — Software Org Applicability (as of 2025-09-03)
 
 ## Latest updates (dates & links)
@@ -57,19 +31,19 @@ On August 27, 2025, NIST issued a minor release of [SP 800-53 (Release 5.2.0)](h
 
 A list of all the changes in the patch release is [available](/files/pubs/sp/800/53/r5/upd1/final/docs/sp800-53r5-potential-updates.xlsx) under Supplemental Material.
 - * [**Analysis of updates between 800-53 Rev.
-- 4**](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/sp800-53r4-to-r5-comparison-workbook.xlsx) (Updated 1/07/22)
+- 4**](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/sp800-53r4-to-r5-comparison-workbook.xlsx) (Updated 1/07/22)  
 Describes the changes to each control and control enhancement, provides a brief summary of the changes, and includes an assessment of the significance of the changes.
 - _Note that this comparison was authored by The MITRE Corporation for the Director of National Intelligence (DNI) and is being shared with permission by DNI._
 
 * [**Mapping of Appendix J Privacy Controls (Rev.
-- 5**](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/sp800-53r4-appj-to-r5-comparison.xlsx)
+- 5**](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/sp800-53r4-appj-to-r5-comparison.xlsx)  
 Supports organizations using the privacy controls in Appendix J of SP 800-53 Rev.
 - 4 that are transitioning to the integrated control catalog in Rev.
 - * **Mappings and crosswalks between 800-53 Rev.
-- 5 and other frameworks and standards** ([NIST Cybersecurity Framework and NIST Privacy Framework](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/csf-pf-to-sp800-53r5-mappings.xlsx); [ISO/IEC 27001:2022](https://csrc.nist.gov/projects/olir/informative-reference-catalog/details?referenceId=155#/))
+- 5 and other frameworks and standards** ([NIST Cybersecurity Framework and NIST Privacy Framework](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/csf-pf-to-sp800-53r5-mappings.xlsx); [ISO/IEC 27001:2022](https://csrc.nist.gov/projects/olir/informative-reference-catalog/details?referenceId=155#/))  
 Mappings and crosswalks provide a general indication of SP 800-53 control coverage with respect to other frameworks and standards.
 - Do not assume equivalency based solely on relationship tables; mappings and crosswalks are not always one-to-one and relationship analysis can be subjective.
-- * **Security and Privacy Control Collaboration Index Template**([Excel](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/sp800-53-collaboration-index-template.xlsx) & [Word](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/sp800-53-collaboration-index-template.docx))
+- * **Security and Privacy Control Collaboration Index Template**([Excel](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/sp800-53-collaboration-index-template.xlsx) & [Word](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/sp800-53-collaboration-index-template.docx))  
 The collaboration index template supports information security and privacy program collaboration to help ensure that the objectives of both disciplines are met and that risks are appropriately managed.
 - It is an optional tool for information security and privacy programs to identify the degree of collaboration needed between security and privacy programs with respect to the selection and/or implementation of controls in Rev.
 
@@ -142,67 +116,3 @@ See full abstract
 - NIST Updates SP 800-128 | CSRC — https://csrc.nist.gov/news/2019/nist-updates-sp-800-128
 - NIST Special Publication (SP) 800 series — https://csrc.nist.gov/publications/sp800
 - SP 800-40 Rev. 4, Guide to Enterprise Patch Management Planning ... — https://csrc.nist.gov/pubs/sp/800/40/r4/final
-
-</details>
-
-<!-- END:LATEST_SP800_SUMMARY -->"
-
-def write_summary(markdown: str, *, preview_lines: Optional[int] = 200) -> None:
-    """
-    Save the full summary to docs/latest-sp800-summary.md and
-    update README.md with a replaceable block containing a link and a preview.
-
-    Parameters
-    ----------
-    markdown : str
-        Full Markdown content of the generated summary.
-    preview_lines : Optional[int]
-        Number of lines to show inside the README's collapsible preview.
-        Use None to embed the full summary in README (not recommended for large files).
-    """
-    DOCS_DIR.mkdir(parents=True, exist_ok=True)
-    SUMMARY_MD.write_text(markdown, encoding="utf-8")
-    _update_readme(markdown, preview_lines=preview_lines)
-
-def _update_readme(md: str, *, preview_lines: Optional[int]) -> None:
-    if README_PATH.exists():
-        text = README_PATH.read_text(encoding="utf-8")
-    else:
-        text = "# NIST SP 800 Updates\n\n"
-
-    timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
-
-    if preview_lines is None:
-        preview_block = md.strip()
-        preview_note = "_Full content embedded below._"
-    else:
-        lines = [ln.rstrip() for ln in md.splitlines()]
-        preview_block = "\n".join(lines[:preview_lines]).strip()
-        preview_note = f"_Preview of first {preview_lines} lines. Full report linked below._"
-
-    block = (
-        f"{START}\n\n"
-        f"## Latest NIST SP 800 Summary\n"
-        f"_Last updated: {timestamp}_\n\n"
-        f"➡️ **[Read the full summary]({SUMMARY_MD.as_posix()})**\n\n"
-        f"{preview_note}\n\n"
-        f"<details>\n"
-        f"<summary>Click to expand preview</summary>\n\n"
-        f"{preview_block}\n\n"
-        f"</details>\n\n"
-        f"{END}"
-    )
-
-    if START in text and END in text:
-        # Replace existing block (non-greedy, dotall)
-        pattern = re.compile(
-            re.escape(START) + r".*?" + re.escape(END),
-            flags=re.DOTALL,
-        )
-        text = pattern.sub(block, text, count=1)
-    else:
-        # Append the block to the end
-        text = text.rstrip() + "\n\n" + block + "\n"
-
-    README_PATH.write_text(text, encoding="utf-8")
-
