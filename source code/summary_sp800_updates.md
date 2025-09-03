@@ -1,14 +1,3 @@
-# Nist-Sp800-Updates-
-Latest updates on the NIST Sp800, Agentic AI Workflow that gives Updates and Applicability Summaries 
-
-START = "<!-- START:LATEST_SP800_SUMMARY -->
-
-## Latest NIST SP 800 Summary
-_Last updated: 2025-09-03 23:22 UTC_  ·  [Open as a standalone file](/workspaces/Nist-Sp800-Updates-/docs/latest-sp800-summary.md)
-
-<details>
-<summary>Preview (first 200 lines)</summary>
-
 # NIST SP 800 Updates — Software Org Applicability (as of 2025-09-03)
 
 ## Latest updates (dates & links)
@@ -42,19 +31,19 @@ On August 27, 2025, NIST issued a minor release of [SP 800-53 (Release 5.2.0)](h
 
 A list of all the changes in the patch release is [available](/files/pubs/sp/800/53/r5/upd1/final/docs/sp800-53r5-potential-updates.xlsx) under Supplemental Material.
 - * [**Analysis of updates between 800-53 Rev.
-- 4**](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/sp800-53r4-to-r5-comparison-workbook.xlsx) (Updated 1/07/22)
+- 4**](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/sp800-53r4-to-r5-comparison-workbook.xlsx) (Updated 1/07/22)  
 Describes the changes to each control and control enhancement, provides a brief summary of the changes, and includes an assessment of the significance of the changes.
 - _Note that this comparison was authored by The MITRE Corporation for the Director of National Intelligence (DNI) and is being shared with permission by DNI._
 
 * [**Mapping of Appendix J Privacy Controls (Rev.
-- 5**](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/sp800-53r4-appj-to-r5-comparison.xlsx)
+- 5**](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/sp800-53r4-appj-to-r5-comparison.xlsx)  
 Supports organizations using the privacy controls in Appendix J of SP 800-53 Rev.
 - 4 that are transitioning to the integrated control catalog in Rev.
 - * **Mappings and crosswalks between 800-53 Rev.
-- 5 and other frameworks and standards** ([NIST Cybersecurity Framework and NIST Privacy Framework](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/csf-pf-to-sp800-53r5-mappings.xlsx); [ISO/IEC 27001:2022](https://csrc.nist.gov/projects/olir/informative-reference-catalog/details?referenceId=155#/))
+- 5 and other frameworks and standards** ([NIST Cybersecurity Framework and NIST Privacy Framework](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/csf-pf-to-sp800-53r5-mappings.xlsx); [ISO/IEC 27001:2022](https://csrc.nist.gov/projects/olir/informative-reference-catalog/details?referenceId=155#/))  
 Mappings and crosswalks provide a general indication of SP 800-53 control coverage with respect to other frameworks and standards.
 - Do not assume equivalency based solely on relationship tables; mappings and crosswalks are not always one-to-one and relationship analysis can be subjective.
-- * **Security and Privacy Control Collaboration Index Template**([Excel](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/sp800-53-collaboration-index-template.xlsx) & [Word](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/sp800-53-collaboration-index-template.docx))
+- * **Security and Privacy Control Collaboration Index Template**([Excel](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/sp800-53-collaboration-index-template.xlsx) & [Word](/CSRC/media/Publications/sp/800-53/rev-5/final/documents/sp800-53-collaboration-index-template.docx))  
 The collaboration index template supports information security and privacy program collaboration to help ensure that the objectives of both disciplines are met and that risks are appropriately managed.
 - It is an optional tool for information security and privacy programs to identify the degree of collaboration needed between security and privacy programs with respect to the selection and/or implementation of controls in Rev.
 
@@ -100,7 +89,7 @@ Questions on the NIST SP 800-53 Public Comment Site and draft SP 800-53 controls
 
 Following the completion of the comment period, NIST will review and adjudicate comments. NIST SP 800-53 Release 5.2.0 will be issued on or before September 2, 2025, as an online dataset on the [Cybersecurity and Privacy Reference Tool](https://csrc.nist.gov/projects/cprt/catalog#/cprt/home).
 
-Questions on the NIST SP 800-53 Public Comment Site and draft SP 800-53 controls can be directed to [[email protected]](/cdn-cgi/l/email-protection#576f67677a626434383a3a32392324173b3e242379393e242379303821).
+Questions on the NIST SP 800-53 Public Comment Site and draft SP 800-53 controls can be directed to [[email protected]](/cdn-cgi/l/email-protection#546c6464796167373b3939313a202714383d27207a3a3d27207a333b22).
   - _Mappings_: NIST SP 800-53 (indicative): AC-2, AC-3, SC-12, SC-13; NIST SP 800-171 (indicative): 3.1, 3.13; NIST SP 800-218 SSDF (indicative): GV.1, PW.10
 - NIST announces an update of **[Special Publication (SP) 800-128](/pubs/sp/800/128/upd1/final)** _**, Guide for Security-Focused Configuration Management of Information Systems** , _which provides guidelines for organizations responsible for managing and administering the security of federal systems and associated environments of operation. The document focuses on the implementation of system security aspects of configuration management, and as such, the term “security-focused configuration management” (SecCM) is used to emphasize the concentration on information security. NIST has released an errata update to reflect changes that have occurred in technology, terminology, and references since the document’s original publication in 2011. No significant or technical changes have been made to the recommended guidance for SecCM.
   - _Mappings_: NIST SP 800-53 (indicative): —; NIST SP 800-171 (indicative): —; NIST SP 800-218 SSDF (indicative): —
@@ -127,7 +116,3 @@ See full abstract
 - NIST Updates SP 800-128 | CSRC — https://csrc.nist.gov/news/2019/nist-updates-sp-800-128
 - NIST Special Publication (SP) 800 series — https://csrc.nist.gov/publications/sp800
 - SP 800-40 Rev. 4, Guide to Enterprise Patch Management Planning ... — https://csrc.nist.gov/pubs/sp/800/40/r4/final
-
-</details>
-
-<!-- END:LATEST_SP800_SUMMARY -->"

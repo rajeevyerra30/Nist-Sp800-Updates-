@@ -35,8 +35,8 @@ def find_summary():
         ROOT / "docs" / "latest-sp800-summary.md",
         ROOT / "latest-sp800-summary.md",
         ROOT / "summary.md",
-        ROOT / "source code" / "latest-sp800-summary.md",
-        ROOT / "source code" / "summary.md",
+        ROOT / "Sorce Code" / "latest-sp800-summary.md",
+        ROOT / "Sorce Code" / "summary.md",
     ]
     # Also pick any sp800*.md under docs/
     docs = ROOT / "docs"
