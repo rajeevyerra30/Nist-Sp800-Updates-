@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.env
+.git
+.gitignore
+publish.log
+
+# generated outputs
+docs/
+source code/.ipynb_checkpoints/
+source code/docs/
+source code/step1_nist_sp800_raw.json
+source code/step1_nist_sp800_raw.backup.json
+source code/step2_filtered.json
+source code/step2_filtered.md
+source code/summary_sp800_updates.md
+step1_nist_sp800_raw.json
+step1_nist_sp800_raw.backup.json
+step2_filtered.json
+step2_filtered.md
+summary_sp800_updates.md

@@ -1,0 +1,10 @@
+services:
+  nist-sp800:
+    image: nist-sp800:latest
+    build:
+      context: .
+    env_file:
+      - .env   # optional; or pass -e vars at runtime
+    volumes:
+      - ./:/app
+    command: ["python", "publish.py"]
